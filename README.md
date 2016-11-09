@@ -115,15 +115,16 @@ Use `#pragma mark -` to categorize methods in functional groupings and protocol/
 
 ## Spacing
 
-* Indent using 2 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
+* Indent using 4 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
 
 **Preferred:**
 ```objc
 if (user.isHappy) {
-  //Do something
-} else {
-  //Do something else
+  // Do something
+} 
+else {
+  // Do something else
 }
 ```
 
@@ -134,6 +135,13 @@ if (user.isHappy)
     //Do something
 }
 else {
+    //Do something else
+}
+
+if (user.isHappy)
+{
+    //Do something
+} else {
     //Do something else
 }
 ```
@@ -190,14 +198,14 @@ UIButton *settingsButton;
 UIButton *setBut;
 ```
 
-A three letter prefix should always be used for class names and constants, however may be omitted for Core Data entity names. For any official raywenderlich.com books, starter kits, or tutorials, the prefix 'RWT' should be used.
+A three letter prefix (SBE) should always be used for class names and constants in libraries and frameworks, however may be omitted for Core Data entity names. For classes in ShowbiePad, no prefix will be used. Constants should be prefixed with SBE.
 
-Constants should be camel-case with all words capitalized and prefixed by the related class name for clarity.
+Constants should be title-case with all words capitalized and prefixed by the related class name for clarity.
 
 **Preferred:**
 
 ```objc
-static NSTimeInterval const RWTTutorialViewControllerNavigationFadeAnimationDuration = 0.3;
+static NSTimeInterval const SBETutorialViewControllerNavigationFadeAnimationDuration = 0.3;
 ```
 
 **Not Preferred:**
@@ -283,13 +291,14 @@ Direct access to instance variables that 'back' properties should be avoided exc
 
 ## Property Attributes
 
-Property attributes should be explicitly listed, and will help new programmers when reading the code.  The order of properties should be storage then atomicity, which is consistent with automatically generated code when connecting UI elements from Interface Builder.
+Property attributes should be explicitly listed, and will help new programmers when reading the code. The order of properties should be readonly, storage, then nullability, which is consistent with automatically generated code when connecting UI elements from Interface Builder. Atomicity should not be removed to be consistent with the newer Apple frameworks.
 
 **Preferred:**
 
 ```objc
-@property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (strong, nonatomic) NSString *tutorialName;
+@property (weak, nullable) IBOutlet UIView *containerView;
+@property (readonly, nullable) NSString *tutorialName;
+@property BOOL editable;
 ```
 
 **Not Preferred:**
@@ -297,6 +306,7 @@ Property attributes should be explicitly listed, and will help new programmers w
 ```objc
 @property (nonatomic, weak) IBOutlet UIView *containerView;
 @property (nonatomic) NSString *tutorialName;
+@property (nonatomic, assign) BOOL editable; 
 ```
 
 Properties with mutable counterparts (e.g. NSString) should prefer `copy` instead of `strong`. 
@@ -378,7 +388,7 @@ static CGFloat const RWTImageThumbnailHeight = 50.0;
 
 ## Enumerated Types
 
-When using `enum`s, it is recommended to use the new fixed underlying type specification because it has stronger type checking and code completion. The SDK now includes a macro to facilitate and encourage use of fixed underlying types: `NS_ENUM()`
+When using `enum`s, it is recommended to use the new fixed underlying type specification because it has stronger type checking and code completion. The SDK now includes a macro to facilitate and encourage use of fixed underlying types: `NS_ENUM()`. The raw value of enums should be NSInteger for better Swift interoperability.
 
 **For Example:**
 
@@ -416,7 +426,6 @@ enum GlobalConstants {
 ## Case Statements
 
 Braces are not required for case statements, unless enforced by the complier.  
-When a case contains more than one line, braces should be added.
 
 ```objc
 switch (condition) {
@@ -424,8 +433,7 @@ switch (condition) {
     // ...
     break;
   case 2: {
-    // ...
-    // Multi-line example using braces
+    // Case requires braces as enforced by the compiler
     break;
   }
   case 3:
@@ -443,7 +451,7 @@ There are times when the same code can be used for multiple cases, and a fall-th
 ```objc
 switch (condition) {
   case 1:
-    // ** fall-through! **
+    // fallthrough
   case 2:
     // code executed for values 1 and 2
     break;
@@ -454,7 +462,7 @@ switch (condition) {
 
 ```
 
-When using an enumerated type for a switch, 'default' is not needed.   For example:
+When using an enumerated type for a switch, 'default' is not needed. For example:
 
 ```objc
 RWTLeftMenuTopItemType menuType = RWTLeftMenuTopItemMain;
@@ -510,6 +518,31 @@ if ([anotherObject boolValue] == NO) {}
 if (isAwesome == YES) {} // Never do this.
 if (isAwesome == true) {} // Never do this.
 ```
+
+Prefer handling the affirmative statement first in an if/else statement with boolean checks.
+
+**Preferred:**
+
+```objc
+if (error) {
+   // there is an error
+}
+else {
+   // there is no error
+}
+```
+
+**Not Preferred:**
+
+```objc
+if (!error) {
+   // there is no error
+}
+else {
+   // there is an error
+}
+```
+
 
 If the name of a `BOOL` property is expressed as an adjective, the property can omit the “is” prefix but specifies the conventional name for the get accessor, for example:
 
@@ -700,21 +733,6 @@ A long line of code like this should be carried on to the second line adhering t
 self.productsRequest = [[SKProductsRequest alloc] 
   initWithProductIdentifiers:productIdentifiers];
 ```
-
-
-## Smiley Face
-
-Smiley faces are a very prominent style feature of the raywenderlich.com site!  It is very important to have the correct smile signifying the immense amount of happiness and excitement for the coding topic.  The end square bracket is used because it represents the largest smile able to be captured using ascii art.  A half-hearted smile is represented if an end parenthesis is used, and thus not preferred.
-
-**Preferred:**
-```objc
-:]
-```
-
-**Not Preferred:**
-```objc
-:)
-```  
 
 
 ## Xcode project
