@@ -113,6 +113,23 @@ Use `#pragma mark -` to categorize methods in functional groupings and protocol/
 - (NSString *)description {}
 ```
 
+Headers should be organized with the following structure. `@class` and `@protocol` declarations should each be on their own line.
+
+```objc
+#import "file.h"
+
+@class declarations
+
+@protocol declarations
+
+NS_ENUM
+NS_OPTION
+
+@property declarations
+
+method declarations
+```
+
 ## Spacing
 
 * Indent using 4 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
@@ -260,6 +277,34 @@ The usage of the word "and" is reserved.  It should not be used for multiple par
 - (instancetype)initWith:(int)width and:(int)height;  // Never do this.
 ```
 
+The usage of target/action APIs should be preferred over block-based APIs on UIControl to maintain clarity in intent. NSNotificationCenter observers can use either the block or selector-based APIs. However, if the implementation within the block becomes too large the logic should be extracted into its own method and the selector-based API should be used. Extracted methods should never be called from a block-based notification observer.
+
+**Preferred**
+```objc
+[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(method:) name:name object:object];
+self.observer = [[NSNotificationCenter defaultCenter] addObserverForName:name 
+								  object:object
+								   queue:nil
+							      usingBlock:^(NSNotification *notification) {
+								   // short block logic here
+								}];
+```
+
+**Not Preferred**
+```objc
+self.observer = [[NSNotificationCenter defaultCenter] addObserverForName:name 
+								  object:object
+								   queue:nil
+							      usingBlock:^(NSNotification *notification) {
+								   __weak typeof(self)weakSelf = self;
+								   [weakSelf someMethod];    
+								}];
+								
+- (void)someMethod {
+   // logic 
+}
+```
+
 ## Variables
 
 Variables should be named as descriptively as possible. Single letter variable names should be avoided except in `for()` loops.
@@ -346,13 +391,13 @@ UIApplication.sharedApplication.delegate;
 
 ## Literals
 
-`NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals should be used whenever creating immutable instances of those objects. Pay special care that `nil` values can not be passed into `NSArray` and `NSDictionary` literals, as this will cause a crash.
+`NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals should be used whenever creating immutable instances of those objects. Pay special care that `nil` values can not be passed into `NSArray` and `NSDictionary` literals, as this will cause a crash. `NSArray` and `NSDictionary` objects should always be created using the generic syntax for type-safety and clarity.
 
 **Preferred:**
 
 ```objc
-NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
-NSDictionary *productManagers = @{@"iPhone": @"Kate", @"iPad": @"Kamal", @"Mobile Web": @"Bill"};
+NSArray<NSString *> *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
+NSDictionary<NSString *, NSString *> *productManagers = @{@"iPhone": @"Kate", @"iPad": @"Kamal", @"Mobile Web": @"Bill"};
 NSNumber *shouldUseLiterals = @YES;
 NSNumber *buildingStreetNumber = @10018;
 ```
@@ -361,7 +406,9 @@ NSNumber *buildingStreetNumber = @10018;
 
 ```objc
 NSArray *names = [NSArray arrayWithObjects:@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul", nil];
+NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
 NSDictionary *productManagers = [NSDictionary dictionaryWithObjectsAndKeys: @"Kate", @"iPhone", @"Kamal", @"iPad", @"Bill", @"Mobile Web", nil];
+NSDictionary *productManagers = @{@"iPhone": @"Kate", @"iPad": @"Kamal", @"Mobile Web": @"Bill"};
 NSNumber *shouldUseLiterals = [NSNumber numberWithBool:YES];
 NSNumber *buildingStreetNumber = [NSNumber numberWithInteger:10018];
 ```
@@ -462,7 +509,7 @@ switch (condition) {
 
 ```
 
-When using an enumerated type for a switch, 'default' is not needed. For example:
+When using an enumerated type for a switch, 'default' should not be included. Any enumerations not included should be grouped together and fallthrough to a break. For example:
 
 ```objc
 RWTLeftMenuTopItemType menuType = RWTLeftMenuTopItemMain;
@@ -472,8 +519,6 @@ switch (menuType) {
     // ...
     break;
   case RWTLeftMenuTopItemShows:
-    // ...
-    break;
   case RWTLeftMenuTopItemSchedule:
     // ...
     break;
