@@ -50,7 +50,6 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Error handling](#error-handling)
 * [Singletons](#singletons)
 * [Line Breaks](#line-breaks)
-* [Smiley Face](#smiley-face)
 * [Xcode Project](#xcode-project)
 
 
