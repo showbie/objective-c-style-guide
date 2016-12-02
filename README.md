@@ -350,12 +350,12 @@ Direct access to instance variables that 'back' properties should be avoided exc
 
 ## Property Attributes
 
-Property attributes should be explicitly listed, and will help new programmers when reading the code. The order of properties should be readonly, storage, then nullability, which is consistent with automatically generated code when connecting UI elements from Interface Builder. Atomicity should not be removed to be consistent with the newer Apple frameworks.
+Property attributes should be explicitly listed, and will help new programmers when reading the code. The order of properties should be readonly, storage, then nullability, which is consistent with automatically generated code when connecting UI elements from Interface Builder. Atomicity should not be included by default, making properties atomic. Nonatomic properties should only be used if necessary. If overriding accessor methods for atomic properties, ensure that accessing the underlying instance variables is wrapped with a `@sychronized(self)` call to fulfil the atomic contract.
 
 **Preferred:**
 
 ```objc
-@property (weak, nullable) IBOutlet UIView *containerView;
+@property (nonatomic, weak, nullable) IBOutlet UIView *containerView;
 @property (readonly, nullable) NSString *tutorialName;
 @property BOOL editable;
 ```
@@ -363,9 +363,9 @@ Property attributes should be explicitly listed, and will help new programmers w
 **Not Preferred:**
 
 ```objc
-@property (nonatomic, weak) IBOutlet UIView *containerView;
+@property (nullable, nonatomic, weak) IBOutlet UIView *containerView;
 @property (nonatomic) NSString *tutorialName;
-@property (nonatomic, assign) BOOL editable; 
+@property (atomic, assign) BOOL editable; 
 ```
 
 Properties with mutable counterparts (e.g. NSString) should prefer `copy` instead of `strong`. 
